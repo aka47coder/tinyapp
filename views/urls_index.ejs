@@ -9,6 +9,12 @@
   <title>TinyApp</title>
 </head>
 <body>
+  <style>
+  .button:hover {
+    background-color: #4CAF50;
+    color: white;
+  }
+</style>
   <%- include('partials/_header') %>
   <main style="margin: 1em;">
     <h3>My URLs</h3>
@@ -22,8 +28,15 @@
       <tbody>
         <% for(let url in urls) { %>
           <tr>
+            
             <td><%= url %></td>
             <td><%= urls[url] %></td>
+            <td><form method="POST" action="/urls/<%= url %>/edit"><button type="submit" class="btn btn-outline-primary">Edit</button>
+             
+            </form></td>
+            
+            <td><form method="POST" action="/urls/<%= url %>/delete"><button type="submit" class="btn btn-outline-danger">Delete</button></form></td>
+              
           </tr>
         <% } %>
       </tbody>
