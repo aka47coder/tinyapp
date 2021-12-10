@@ -10,5 +10,30 @@
           <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
         </div>
       </div>
+      <div>
+        <%if (!user){%>
+          <form method="GET" action="/login">
+            <!-- <input type="text" name="username"> -->
+            <button type="submit" class="btn btn-primary">Login</button>
+          </form>
+
+          <form method="GET" action="/register">
+            <!-- <input type="text" name="username"> -->
+            <button type="submit" class="btn btn-primary">Register</button>
+          </form>
+
+          <% } else { %>
+          
+          <form method="POST" action="/logout">
+            <span>
+              <label for="username">Username:</label>
+              <%= user.email %> 
+              <button type="submit" style="border-color:black" class="btn btn-success">Logout</button></p>
+            </span>
+          </form>
+          <% } %>
+
+
+      </div>
     </nav>
   </header>
