@@ -1,11 +1,21 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 
-var cookieParser = require("cookie-parser");
+//var cookieParser = require("cookie-parser");
 
 const app = express();
 const PORT = 8080; // default port 8080
-app.use(cookieParser());
+//app.use(cookieParser());
+
+const cookieSession = require("cookie-session")
+
+app.use(cookieSession({
+  name: 'session',
+  keys: ["mykey","backup"],
+
+ 
+}))
+
 
 app.set("view engine", "ejs");
 
@@ -51,9 +61,9 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const user = req.cookies["user"];
+  const user = req.session["user"];
   //console.log('-----------------COOKIE', userCookie)
-  if (req.cookies["user"] === undefined) {
+  if (req.session["user"] === undefined) {
     //res.status(403).send("User not found");
     res.render("login");
   }
@@ -63,7 +73,7 @@ app.get("/urls/new", (req, res) => {
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   const id = generateRandomString();
-  const userID = req.cookies["user"];
+  const userID = req.session["user"];
   urlDatabase[id] = { longURL: req.body.longURL, userID };
   console.log("PRINTING URL DATABASE", urlDatabase);
   //[NEW URL ENTERY]
@@ -78,7 +88,7 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 app.get("/urls", (req, res) => {
-  const userid = req.cookies["user"];
+  const userid = req.session["user"];
   console.log("urls", urlDatabase);
   console.log("urls", userid);
   const userUrls = urlsForUser(userid);
@@ -88,7 +98,7 @@ app.get("/urls", (req, res) => {
 });
 app.get("/urls/:shortURL", (req, res) => {
   //console.log(req);
-  const userid = req.cookies["user"];
+  const userid = req.session["user"];
   const user = users[userid];
   console.log("get urls id", urlDatabase);
   const shortURL = req.params.shortURL;
@@ -119,7 +129,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   // const longURL = ...
   const new1 = req.params.shortURL;
   if (urlDatabase[new1]) {
-    if (urlDatabase[new1].userID === req.cookies.user) {
+    if (urlDatabase[new1].userID === req.session["user"]) {
       delete urlDatabase[new1];
     } else {
       res.status(400).send("you can not delete this url");
@@ -134,13 +144,13 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 app.post("/urls/:shortURL", (req, res) => {
-  if (!req.cookies.user) {
+  if (!req.session["user"]) {
     res.status(400).send("We need to login page");
   }
   const shortURL = req.params.shortURL;
   //console.log(req.params)
   if (urlDatabase[shortURL]) {
-    if (urlDatabase[shortURL].userID === req.cookies.user) {
+    if (urlDatabase[shortURL].userID === req.session["user"]) {
       urlDatabase[shortURL].longURL = req.body.url;
     } else {
       res.status(400).send("you can not edit this url");
@@ -163,7 +173,7 @@ app.post("/urls/:shortURL", (req, res) => {
 // });
 app.post("/logout", (req, res) => {
   console.log("CLEARING COOKIIIIIIESSS");
-  res.clearCookie("user");
+  req.session=null;
   res.redirect("/urls");
 });
 //////////////////////////////Register
@@ -188,7 +198,7 @@ app.post("/register", (req, res) => {
     email: req.body.email,
     password: hashedPassword,
   };
-  res.cookie("user", userid);
+  req.session["user"]= userid;
   res.redirect("/urls");
 });
 ///////////////////////////Login page
@@ -218,7 +228,7 @@ app.post("/login", (req, res) => {
     return res.status(403).send("Wrong Password:Please try Again");
   }
 
-  res.cookie("user", user.id);
+  req.session["user"]= user.id;
   res.redirect("/urls");
 });
 
