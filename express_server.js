@@ -139,7 +139,7 @@ app.post("/urls/:shortURL", (req, res) => {
   }
   const shortURL = req.params.shortURL;
   //console.log(req.params)
-  if (urlDatabase[new1]) {
+  if (urlDatabase[shortURL]) {
     if (urlDatabase[shortURL].userID === req.cookies.user) {
       urlDatabase[shortURL].longURL = req.body.url;
     } else {
