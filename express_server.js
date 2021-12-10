@@ -180,10 +180,13 @@ app.post("/register", (req, res) => {
   }
   console.log(req.body);
   let userid = generateRandomString();
+  const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
+
   users[userid] = {
     id: userid,
     email: req.body.email,
-    password: req.body.password,
+    password: hashedPassword,
   };
   res.cookie("user", userid);
   res.redirect("/urls");
@@ -197,6 +200,7 @@ app.post("/login", (req, res) => {
   console.log("==============", req.body);
   const email = req.body.email;
   const password = req.body.password;
+  
   let user;
   for (const userid in users) {
     if (users[userid].email === email) {
@@ -206,8 +210,11 @@ app.post("/login", (req, res) => {
   if (!user) {
     return res.status(403).send("User not found");
   }
-
-  if (user.password !== password) {
+  const hashedPassword = user.password;
+  ;
+  bcrypt.compareSync(password, hashedPassword);
+  console.log([password,hashedPassword])
+  if (!bcrypt.compareSync(password, hashedPassword)) {
     return res.status(403).send("Wrong Password:Please try Again");
   }
 
