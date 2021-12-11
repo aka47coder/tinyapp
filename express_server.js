@@ -1,5 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
+const { getUserByEmail } = require('./helpers.js');
+
 
 //var cookieParser = require("cookie-parser");
 
@@ -55,6 +57,9 @@ function urlsForUser(id) {
 
   return userUrls;
 }
+
+
+////////////////////////////////////////////////////////////
 
 app.get("/", (req, res) => {
   res.redirect("/urls");
