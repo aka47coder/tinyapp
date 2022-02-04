@@ -104,9 +104,18 @@ app.get("/urls", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   //console.log(req);
   const userid = req.session["user"];
+  if (!userid){
+    res.status(400).send("you should be login");
+        return;
+  }
+  
   const user = users[userid];
   console.log("get urls id", urlDatabase);
   const shortURL = req.params.shortURL;
+  if (urlDatabase[shortURL].userID !== userid){
+    res.status(400).send("you dont own this url");
+    return;
+  }
 
   const longURL = urlDatabase[shortURL] && urlDatabase[shortURL].longURL;
   if (!longURL) {
@@ -188,9 +197,14 @@ app.get("/register", (req, res) => {
 
 app.post("/register", (req, res) => {
   // const longURL = ...
+  if (req.body.email===""||req.body.password===""){
+    res.status(400).send("password and email cannot be blank");
+    return;
+  }
   for (let item in users) {
-    if (req.body.email === "" || req.body.email === users[item].email) {
-      res.status(400).send("400 Error");
+    if (req.body.email === users[item].email) {
+      res.status(400).send("email alrady exsit ");
+      return;
     }
   }
   console.log(req.body);
